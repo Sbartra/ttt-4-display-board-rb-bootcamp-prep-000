@@ -2,7 +2,7 @@
 # out the current state.
 
 class TicTacToe
-  
+
   WIN_COMBINATIONS = [[0,1,2],
                     [3,4,5],
                     [6,7,8],
@@ -11,12 +11,12 @@ class TicTacToe
                     [2,5,8],
                     [0,4,8],
                     [2,4,6]]
-  
+
   def initialize(board = nil)
     @board = board || Array.new(9, " ")
-  end  
-  
-  
+  end
+
+
   def display_board
     puts " #{@board[0]} | #{@board[1]} | #{@board[2]} "
     puts "-----------"
@@ -65,23 +65,23 @@ class TicTacToe
     end
    return turn
   end
-  
+
   def current_player
     return turn_count.even? ? "X" : "O"
   end
-  
+
   def get_locations(player = "X")
     locations = []
-    location = 0 
+    location = 0
     while(location < 9) do
       if @board[location].strip == player.strip
         locations << location
       end
-      location += 1 
+      location += 1
       end
     return locations
   end
-  
+
   def won?
     x_locations = get_locations
     y_locations = get_locations("O")
@@ -96,25 +96,25 @@ class TicTacToe
     end
     return FALSE
   end
-  
-  
+
+
   def full?
     return @board.detect{|a| a == " " || a == "" || a == nil} == nil
   end
-  
+
   def draw?
     return !(won?) && (full?)
   end
-  
+
   def over?
     return draw? || won? || full?
   end
-  
+
   def winner
     winLocation = won?
     return winLocation ? ((get_locations.detect{|a| a == winLocation[0]} != nil && get_locations.detect{|a| a == winLocation[1]} != nil && get_locations.detect{|a| a == winLocation[2]} != nil) ? "X" : "O")  : nil
   end
-    
+
   def play
   while !(over?) do
     turn
@@ -124,6 +124,6 @@ class TicTacToe
   elsif draw? then
     puts "Cat's Game!"
   end
-end  
-  
+end
+
 end
