@@ -1,124 +1,129 @@
 # Define display_board that accepts a board and prints
 # out the current state.
 
-require 'set'
-
 class TicTacToe
-
-WIN_COMBINATIONS = [
-[0,1,2],
-[3,4,5],
-[6,7,8],
-[0,3,6],
-[1,4,7],
-[2,5,8],
-[0,4,8],
-[2,4,6]
-]
-
-def display_board
-puts " #{@board[0]} | #{@board[1]} | #{@board[2]} "
-puts "-----------"
-puts " #{@board[3]} | #{@board[4]} | #{@board[5]} "
-puts "-----------"
-puts " #{@board[6]} | #{@board[7]} | #{@board[8]} "
-end
-
-def initialize
-@board = Array.new(9, " ")
-@player_x = "X"
-@player_o = "O"
-
-end
-
-def move(index, player)
-if valid_move?(index)
-  @board[index] = player
-  return true
-end
-return false
-end
-
-
-def position_taken?(index)
-@board[index] == "X" || @board[index] == "O"
-end
-
-def valid_move?(index)
-index >=0 && index <=8 && !position_taken?(index)
-end
-
-def input_to_index(input)
-input.to_i - 1
-end
-
-def is_even(num)
-num % 2 == 0
-end
-
-def turn_count
-@board.reject{|space| space != "X" && space != "O"}.length
-end
-
-def current_player
-is_even(turn_count) ? @player_x : @player_o
-end
-
-def turn
-display_board
-puts "Enter a number bewteen 1-9:"
-index = input_to_index(gets.strip)
-until move(index, current_player)
-  puts "Enter a number between 1-9:"
-  index = input_to_index(gets.strip)
-end
-
-end
-
-def play
-until over?
-  turn
-end
-puts won? ? "Congratulations #{winner}!" : "Cat's Game!"
-end
-
-def over?
-draw? || won?
-end
-
-def won?(want_combo = true)
-x_moves = Set.new
-o_moves = Set.new
-
-@board.each.with_index do |move, index|
-  if move == "X"
-    x_moves.add(index)
-  elsif move == "O"
-    o_moves.add(index)
+  
+  WIN_COMBINATIONS = [[0,1,2],
+                    [3,4,5],
+                    [6,7,8],
+                    [0,3,6],
+                    [1,4,7],
+                    [2,5,8],
+                    [0,4,8],
+                    [2,4,6]]
+  
+  def initialize(board = nil)
+    @board = board || Array.new(9, " ")
+  end  
+  
+  
+  def display_board
+    puts " #{@board[0]} | #{@board[1]} | #{@board[2]} "
+    puts "-----------"
+    puts " #{@board[3]} | #{@board[4]} | #{@board[5]} "
+    puts "-----------"
+    puts " #{@board[6]} | #{@board[7]} | #{@board[8]} "
   end
-end
 
-WIN_COMBINATIONS.each do |combination|
-  c = combination.to_set
-  if c.subset?(x_moves)
-    return want_combo ? combination : @player_x
-  elsif c.subset?(o_moves)
-    return want_combo ? combination : @player_o
+
+  def input_to_index(user_input)
+    user_input.to_i - 1
   end
-end
-return nil
-end
 
-def full?
-@board.select{ |i| i == "X" || i == "O" }.length == 9
-end
 
-def winner
-won?(false)
-end
+  def move(index, current_player)
+    @board[index] = current_player
+  end
 
-def draw?
-full? && !won?
-end
+  def position_taken?(location)
+    @board[location] != " " && @board[location] != ""
+  end
 
+  def valid_move?(index)
+    index.between?(0,8) && !position_taken?(index)
+  end
+
+  def turn
+    puts "Please enter 1-9:"
+    input = gets.strip
+    index = input_to_index(input)
+    if valid_move?(index)
+      move(index, current_player)
+      display_board
+    else
+      turn
+    end
+  end
+
+
+  def turn_count
+    turn = 0
+    @board.each do |space|
+      if space.strip == "X" || space.strip =="O"
+        turn += 1
+      end
+    end
+   return turn
+  end
+  
+  def current_player
+    return turn_count.even? ? "X" : "O"
+  end
+  
+  def get_locations(player = "X")
+    locations = []
+    location = 0 
+    while(location < 9) do
+      if @board[location].strip == player.strip
+        locations << location
+      end
+      location += 1 
+      end
+    return locations
+  end
+  
+  def won?
+    x_locations = get_locations
+    y_locations = get_locations("O")
+    locations = [x_locations,y_locations]
+    WIN_COMBINATIONS.each do |combination|
+      locations.each do |location|
+        win = location.detect{|a| a == combination[0]} != nil && location.detect{|a| a == combination[1]} != nil && location.detect{|a| a == combination[2]} != nil
+        if win then
+          return combination
+        end
+      end
+    end
+    return FALSE
+  end
+  
+  
+  def full?
+    return @board.detect{|a| a == " " || a == "" || a == nil} == nil
+  end
+  
+  def draw?
+    return !(won?) && (full?)
+  end
+  
+  def over?
+    return draw? || won? || full?
+  end
+  
+  def winner
+    winLocation = won?
+    return winLocation ? ((get_locations.detect{|a| a == winLocation[0]} != nil && get_locations.detect{|a| a == winLocation[1]} != nil && get_locations.detect{|a| a == winLocation[2]} != nil) ? "X" : "O")  : nil
+  end
+    
+  def play
+  while !(over?) do
+    turn
+  end
+  if won? then
+    puts "Congratulations #{winner}!"
+  elsif draw? then
+    puts "Cat's Game!"
+  end
+end  
+  
 end
